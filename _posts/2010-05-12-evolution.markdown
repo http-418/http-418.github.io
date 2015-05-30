@@ -1,5 +1,6 @@
 ---
 title: Evolution, Evolution-MAPI, and Exchange 2010
+layout: post
 permalink: /blogs/a/entry/evolution_evolution_mapi_and_exchange
 ---
 
@@ -65,9 +66,9 @@ libdcerpc0
 
 After you've installed the newest evolution/libmapi/evolution-mapi, if you have an existing Evolution MAPI account configured, you can use this procedure to add the "Seal: true" attribute for Exchange 2010 encryption. A fellow on gimpnet #evo-mapi, kerihuel, helped me out on this one:
 
-1. Shut down evolution and evolution-data-server, forcibly if necessary. Evolution-data-server runs in the backround even when evolution is not running! (Easiest way to force kill: killall -9 `pgrep evolution`)
+1. Shut down evolution and evolution-data-server, forcibly if necessary. Evolution-data-server runs in the backround even when evolution is not running! (Easiest way to force kill: ```killall -9 `pgrep evolution` ```)
 
-2. Run ldbedit -H ~/.evolution/mapi_profiles.ldb
+2. Run ```ldbedit -H ~/.evolution/mapi_profiles.ldb```
 
 3. Within the profile LDB entry, append "seal: true"
 
