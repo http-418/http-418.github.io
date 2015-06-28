@@ -1,43 +1,33 @@
-<html>
-<head>
-<meta name="google-site-verification" content="ADc5oDLagM_jG37qtmmrIZ5fduSsjmsax1O6Kxg1XK8" />
-<title>jones dot ee cee</title>
-</head>
-<body>
-<style>
-td { font-family: monospace; font-size: large }
-</style>
-<center>
-  <table border="0">
-    <tr>
-      <td colspan="2">
-<PRE>
-       _
-      (_)___  ____  ___  _____         ___  _____
-     / / __ \/ __ \/ _ \/ ___/        / _ \/ ___/
-    / / /_/ / / / /  __(__  )   _    /  __/ /__
- __/ /\____/_/ /_/\___/____/   (_)   \___/\___/
-/___/
+---
+layout: default
+title: Home
+---
 
-</PRE>
-      </td>
-    </tr>
-    <tr>
-      <td align="right">Andrew Jones:</td>
-      <td>
-	<a href="mailto:andrew@jones.ec">Email</a>,
-	<a href="/blogs/a">Blog</a>,
-	<a href="http://github.com/http-418">GitHub</a>
-      </td>
-    </tr>
-    <tr>
-      <td align="right">Kelly Jones:</td>
-      <td>
-	<a href="mailto:kelly.hacker@gmail.com">Email</a>,
-	<!--<a href="http://kelly.jones.ec">CV</a>-->
-      </td>
-    </tr>
-  </table>
-</center>
-</body>
-</html>
+<div class="posts">
+  {% for post in paginator.posts %}
+  <article class="post">
+    <h1 class="post-title">
+      <a href="{{ site.baseurl }}{{ post.url }}">
+        {{ post.title }}
+      </a>
+    </h1>
+
+    <time datetime="{{ post.date | date_to_xmlschema }}" class="post-date">{{ post.date | date_to_string }}</time>
+
+    {{ post.content }}
+  </article>
+  {% endfor %}
+</div>
+
+<div class="pagination">
+  {% if paginator.next_page %}
+    <a class="pagination-item older" href="{{ paginator.next_page_path | prepend: site.baseurl }}">Older</a>
+  {% else %}
+    <span class="pagination-item older">Older</span>
+  {% endif %}
+  {% if paginator.previous_page %}
+    <a class="pagination-item newer" href="{{ paginator.previous_page_path | prepend: site.baseurl }}">Newer</a>
+  {% else %}
+    <span class="pagination-item newer">Newer</span>
+  {% endif %}
+</div>

@@ -1,3 +1,22 @@
-exclude: [vendor]
+exclude: [bin, poole, vendor]
 gems:
   - jekyll-sitemap
+  
+# Use of `relative_permalinks` ensures post links from the index work properly.
+permalink:           pretty
+relative_permalinks: true
+
+title:               From the desk of Andrew Jones
+# tagline:           Who needs a tagline?
+url:                 http://www.jones.ec
+paginate:            1
+baseurl:             "http://www.jones.ec/"
+
+sass:
+  sass_dir:          _sass
+  style:            :compressed
+
+author:
+  name:              Andrew Jones
+  url:               https://github.com/http-418
+  email:             andrew@jones.ec
