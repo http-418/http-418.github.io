@@ -1,4 +1,4 @@
-exclude: [bin, poole, vendor]
+exclude: [bin, vendor]
 gems:
   - jekyll-sitemap
   
@@ -8,9 +8,9 @@ relative_permalinks: true
 
 title:               From the desk of Andrew Jones
 # tagline:           Who needs a tagline?
-url:                 http://www.jones.ec
+#url:                 http://www.jones.ec
 paginate:            1
-baseurl:             "http://www.jones.ec/"
+#baseurl:             "http://www.jones.ec/"
 
 sass:
   sass_dir:          _sass

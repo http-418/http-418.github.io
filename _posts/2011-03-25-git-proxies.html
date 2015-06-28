@@ -1,0 +1,93 @@
+---
+title: Using git through a SOCKS proxy (or SSH tunnel)
+layout: post
+permalink: /blogs/a/entry/using_git_through_a_socks
+---
+
+<p>Git supports two protocols: HTTP and native git (git://).  Unfortunately, git over HTTP is terribly slow.  As a result, most public repositories don't prominently display an HTTP URL, because most people would prefer the git:// URL.</p>
+
+<p>In a corporate environment, one does not commonly have the ability to open arbitrary ports on the outside internet.  In that case, the git:// protocol is effectively unusable without an unrestricted SOCKS proxy.</p>
+
+<p>To work around the problem, I create my own SOCKS proxy via SSH, then use a wrapper script with git.  In essence, this allows me to use git through an SSH tunnel.  Any repository, anywhere: one tunnel.</p>
+
+<span style="display: inline-block; border: 1px solid #000000; font-size: small;  padding: 2em; width: 80%; background: #dddddd">
+<h5>A note on SOCKS and HTTP proxies</h5>
+<p>There are two common proxy types in the wild: SOCKS and HTTP.  Either type can technically proxy any kind of data, but corporate proxies are usually configured to permit only HTTP and HTTPS, and only on known ports.  If you don't know what type of proxy your company uses, it's probably HTTP, and it's probably too restrictive to be useful for the native git protocol.</p>
+
+<p>Most software supports the use of an HTTP proxy, but SOCKS proxy support is a little bit unusual.  Mozilla Firefox and Thunderbird are notable for their excellent SOCKS v4 and v5 support, including remote DNS.</p>
+</span>
+
+<h4>Procedure</h4>
+
+<ol>
+
+<li>
+<h5>Install prerequisites</h5>
+<p>To get everything working, you will need these tools:
+<ul>
+  <li>git</li>
+  <li>socat</li>
+  <li>ssh</li>
+</ul>
+</p>
+</li>
+
+<li>
+<h5>Create your SOCKS4 proxy using SSH</h5>
+<p>If you don't already have an unrestricted SOCKS proxy, you can create one with the standard openssh client.  Much as -L and -R handle port forwarding, the -D option creates a SOCKS version 4 proxy:
+<pre>
+ssh -nNT -D 8119 remote.host
+</pre>
+This command starts a SOCKS v4 proxy listening on localhost, port 8119.  Requests through the proxy will be proxied via the tunnel and emitted by the remote host.</p>
+
+<p>If you substitute <tt>autossh</tt> for <tt>ssh</tt>, you can use the exact same arguments to create a tunnel that will automatically restart and reauthenticate itself in the event of a lost connection.</p>
+</li>
+
+<li>
+<h5>Put together the wrapper script</h5>
+<p>Git supports HTTP proxies out of the box, but it has no builtin SOCKS support.  We need a wrapper script calling <tt>socat</tt> to provide the support.  I got the original script from <a href="http://www.emilsit.net/blog/archives/how-to-use-the-git-protocol-through-a-http-connect-proxy/">a blog post by Emil Sit</a>.  He was using an HTTP proxy instead of SOCKS. 
+<pre>
+#!/bin/sh
+#
+# Use socat to proxy git through a SOCKS proxy.
+# Useful if you are trying to clone git:// from inside a company.
+#
+# See http://tinyurl.com/8xvpny for Emil Sit's original HTTP proxy script.
+# See http://tinyurl.com/45atuth for updated SOCKS version.
+#
+
+# Configuration.
+_proxy=localhost
+_proxyport=8119
+
+exec socat STDIO SOCKS4:$_proxy:$1:$2,socksport=$_proxyport
+
+</pre>
+I put this script in my home directory at <tt>~/bin/git-proxy-wrapper</tt>.<br/>
+Remember to make it executable! (<tt>chmod +x ~/bin/git-proxy-wrapper</tt>)
+</p>  
+
+
+</li>
+
+<li>
+<h5>Set environment variables</h5>
+<p>Git checks the GIT_PROXY_COMMAND environment variable when retrieving data.  To make git:// work through your SOCKS proxy, set the variable to the git-proxy-wrapper script.</p>
+
+<p>
+Tcsh:<pre>setenv GIT_PROXY_COMMAND ~/bin/git-proxy-wrapper</pre>
+Bash:<pre>export GIT_PROXY_COMMAND=~/bin/git-proxy-wrapper</pre>
+</p>
+</li>
+
+<li>
+<h5>Finish up</h5>
+
+<p>At this point, git should work with git:// URLs as long as your proxy or ssh proxy session are working.  Test it out.</p>
+
+<p>If everything works, you can write the git proxy wrapper setting into your ~/.gitconfig.  It's a simple <tt>git config</tt> command:
+<pre>git config --global core.gitproxy ~/bin/git-proxy-wrapper</pre></p>
+</li>
+
+</ol>
+
